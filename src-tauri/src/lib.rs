@@ -1,5 +1,6 @@
 mod window_manager;
 
+use std::process;
 use tauri::{App, Manager, State};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use window_manager::{WindowInfo, WindowManager};
@@ -55,10 +56,13 @@ fn setup_main_window(app: &App) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let current_pid = process::id();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .manage(WindowManager {
             windows: Default::default(),
+            current_pid,
         })
         .setup(|app| {
             setup_main_window(app);

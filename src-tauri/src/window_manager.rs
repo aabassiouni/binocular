@@ -4,8 +4,9 @@ use std::sync::Mutex;
 use windows::core::Error as WindowsError;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE, WIN32_ERROR};
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
-    SetForegroundWindow,
+    EnumWindows, GetForegroundWindow, GetWindowLongW, GetWindowTextW, GetWindowThreadProcessId,
+    IsWindowVisible, SetForegroundWindow, GWL_EXSTYLE, GWL_STYLE, WS_CAPTION, WS_EX_TOOLWINDOW,
+    WS_VISIBLE,
 };
 
 #[derive(Debug)]
@@ -36,6 +37,7 @@ pub struct WindowInfo {
 
 pub struct WindowManager {
     pub windows: Mutex<Vec<WindowInfo>>,
+    pub current_pid: u32,
 }
 
 impl WindowManager {
@@ -74,15 +76,29 @@ impl WindowManager {
             return TRUE;
         }
 
+        let style = GetWindowLongW(hwnd, GWL_STYLE);
+        let ex_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+
+        if (style & ((WS_VISIBLE | WS_CAPTION).0 as i32)) != ((WS_VISIBLE | WS_CAPTION).0 as i32) {
+            return TRUE;
+        }
+
+        if (ex_style & (WS_EX_TOOLWINDOW.0 as i32)) != 0 {
+            return TRUE;
+        }
+
         let mut title = [0u16; 512];
         let len = GetWindowTextW(hwnd, &mut title);
         if len == 0 {
-            // Skip if GetWindowTextW fails or window has no title
             return TRUE;
         }
 
         let mut process_id = 0u32;
         GetWindowThreadProcessId(hwnd, Some(&mut process_id));
+
+        if process_id == window_manager.current_pid {
+            return TRUE;
+        }
 
         let title = String::from_utf16_lossy(&title[..len as usize]);
 
