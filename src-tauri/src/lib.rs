@@ -31,7 +31,13 @@ fn get_windows(app: &AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn focus_window(state: State<WindowManager>, hwnd: isize) -> Result<(), String> {
+fn focus_window(
+    app_handle: tauri::AppHandle,
+    state: State<WindowManager>,
+    hwnd: isize,
+) -> Result<(), String> {
+    let main_window = app_handle.get_webview_window("main").unwrap();
+    main_window.hide().unwrap();
     state.inner().focus_window(hwnd).unwrap();
     Ok(())
 }
