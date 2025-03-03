@@ -13,6 +13,8 @@ type Window = {
 function App() {
   const [windows, setWindows] = useState<Window[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedWindow, setSelectedWindow] = useState<number>(0);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fzf = new Fzf(windows, {
@@ -20,8 +22,6 @@ function App() {
   });
 
   const filteredWindows = fzf.find(search).map((item) => item.item);
-
-  console.log(filteredWindows);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,6 +36,7 @@ function App() {
             if (searchInputRef.current) {
               searchInputRef.current.focus();
             }
+            setSelectedWindow(0);
             setWindows(event.payload);
           }
         });
@@ -55,19 +56,59 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey) {
+        if (e.key === "k") {
+          setSelectedWindow((prev) =>
+            prev < filteredWindows.length - 1 ? prev + 1 : 0
+          );
+        } else if (e.key === "j") {
+          setSelectedWindow((prev) =>
+            prev > 0 ? prev - 1 : filteredWindows.length - 1
+          );
+        }
+      }
+
+      if (e.key === "Enter") {
+        if (selectedWindow < filteredWindows.length) {
+          const window = filteredWindows[selectedWindow];
+          invoke("focus_window", { hwnd: window.hwnd });
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [filteredWindows, selectedWindow]);
+
   return (
     <div className="bg-slate-900 flex flex-col p-4 gap-2 h-screen w-screen">
-      <div className="border border-white flex-1 h-max w-1/2 p-2 flex flex-col-reverse">
-        {filteredWindows.map((window: Window) => (
-          <span
-            onClick={async () => {
-              await invoke("focus_window", { hwnd: window.hwnd });
-            }}
-            className="text-white whitespace-nowrap overflow-hidden text-ellipsis"
-          >
-            {window.title}
-          </span>
-        ))}
+      <div className="flex-1 flex gap-2">
+        <div className="border border-white flex-1 h-full w-1/2 p-2 flex flex-col-reverse">
+          {filteredWindows.map((window: Window, index: number) => {
+            const isSelected = index === selectedWindow;
+            return (
+              <button
+                key={window.hwnd}
+                onClick={async () => {
+                  await invoke("focus_window", { hwnd: window.hwnd });
+                }}
+                style={{
+                  backgroundColor: isSelected ? "#007AFF" : "#000000",
+                }}
+                className="text-white text-left whitespace-nowrap overflow-hidden text-ellipsis"
+              >
+                {window.title}
+              </button>
+            );
+          })}
+        </div>
+        <div className="border border-white flex-1 h-full  w-1/2 p-2">
+          <p className="text-white text-left whitespace-nowrap overflow-hidden text-ellipsis">
+            {selectedWindow}
+          </p>
+        </div>
       </div>
       <div>
         <input
