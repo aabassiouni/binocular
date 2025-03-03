@@ -53,16 +53,16 @@ function App() {
 
   return (
     <div className="bg-slate-900 flex flex-col p-4 gap-2 h-screen w-screen">
-      <div className="border border-white flex-1  h-max w-1/2 p-2 ">
-        {filteredWindows.map((window: any) => (
-          <p
+      <div className="border border-white flex-1 h-max w-1/2 p-2 flex flex-col-reverse">
+        {filteredWindows.map((window: Window) => (
+          <span
             onClick={async () => {
               await invoke("focus_window", { hwnd: window.hwnd });
             }}
-            className="text-white"
+            className="text-white whitespace-nowrap overflow-hidden text-ellipsis"
           >
             {window.title}
-          </p>
+          </span>
         ))}
       </div>
       <div>
