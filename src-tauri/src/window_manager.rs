@@ -3,6 +3,10 @@ use std::fmt;
 use std::sync::Mutex;
 use windows::core::Error as WindowsError;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE, WIN32_ERROR};
+use windows::Win32::Graphics::Dwm::{
+    DwmRegisterThumbnail, DwmUnregisterThumbnail, DwmUpdateThumbnailProperties,
+    DWM_THUMBNAIL_PROPERTIES,
+};
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetForegroundWindow, GetWindowLongW, GetWindowTextW, GetWindowThreadProcessId,
     IsWindowVisible, SetForegroundWindow, GWL_EXSTYLE, GWL_STYLE, WS_CAPTION, WS_EX_TOOLWINDOW,
@@ -66,6 +70,37 @@ impl WindowManager {
             } else {
                 Err(())
             }
+        }
+    }
+
+    pub fn get_window_thumbnail(
+        &self,
+        source_hwnd: isize,
+        dest_hwnd: isize,
+        width: u32,
+        height: u32,
+    ) -> Result<(), WindowsError> {
+        unsafe {
+            let mut thumbnail_id = DwmRegisterThumbnail(HWND(dest_hwnd), HWND(source_hwnd))?;
+
+            let props = DWM_THUMBNAIL_PROPERTIES {
+                dwFlags: 0x1F,
+                rcDestination: windows::Win32::Foundation::RECT {
+                    left: 0,
+                    top: 0,
+                    right: width as i32,
+                    bottom: height as i32,
+                },
+                rcSource: windows::Win32::Foundation::RECT::default(),
+                opacity: 255,
+                fVisible: true.into(),
+                fSourceClientAreaOnly: false.into(),
+            };
+
+            DwmUpdateThumbnailProperties(thumbnail_id, &props)?;
+
+            // You'll need to call DwmUnregisterThumbnail(thumbnail_id) when done
+            Ok(())
         }
     }
 

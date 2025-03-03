@@ -1,13 +1,14 @@
 mod window_manager;
 
 use std::process;
-use tauri::{App, Manager, State};
+use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use window_manager::{WindowInfo, WindowManager};
 
-#[tauri::command]
-fn get_windows(state: State<WindowManager>) -> Result<Vec<WindowInfo>, String> {
+fn get_windows(app: &AppHandle) -> Result<(), String> {
     println!("getting windows");
+
+    let state = app.state::<WindowManager>();
 
     state
         .inner()
@@ -21,13 +22,12 @@ fn get_windows(state: State<WindowManager>) -> Result<Vec<WindowInfo>, String> {
         .iter()
         .for_each(|window| {
             println!("window: {:?}", window);
-            // window_titles.push(window.clone());
         });
 
-    Ok(state.windows.lock().unwrap().clone())
-    // window_titles
-    // Err("not implemented".to_string())
-    //
+    app.emit("windows-updated", state.windows.lock().unwrap().clone())
+        .unwrap();
+
+    Ok(())
 }
 
 #[tauri::command]
@@ -40,6 +40,10 @@ fn setup_main_window(app: &App) {
     let main_window = app.get_webview_window("main").unwrap();
 
     main_window.center().expect("failed to center window");
+
+    main_window
+        .set_resizable(false)
+        .expect("failed to set resizable");
 
     main_window
         .set_decorations(false)
@@ -60,6 +64,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_prevent_default::init())
         .manage(WindowManager {
             windows: Default::default(),
             current_pid,
@@ -73,7 +78,6 @@ pub fn run() {
                     .with_handler(move |app, shortcut, event| {
                         let main_window = app.get_webview_window("main").unwrap();
 
-                        // println!("{:?}", shortcut);
                         if shortcut == &ctrl_n_shortcut {
                             match event.state() {
                                 ShortcutState::Pressed => {
@@ -82,7 +86,9 @@ pub fn run() {
                                         main_window.hide().unwrap();
                                     } else {
                                         println!("showing");
+                                        get_windows(app).unwrap();
                                         main_window.show().unwrap();
+                                        main_window.set_focus().unwrap();
                                     }
                                 }
                                 ShortcutState::Released => {
@@ -98,7 +104,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_windows, focus_window])
+        .invoke_handler(tauri::generate_handler![focus_window])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
