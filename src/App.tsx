@@ -76,7 +76,7 @@ function App() {
           onChange={(e) => setSearch(e.target.value)}
           autoFocus
           placeholder="Search..."
-          className="focus:outline-none border-white border bg-slate-900 text-white p-2"
+          className="focus:outline-none w-full border-white border bg-slate-900 text-white p-2"
         />
       </div>
     </div>
