@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
@@ -13,6 +13,7 @@ type Window = {
 function App() {
   const [windows, setWindows] = useState<Window[]>([]);
   const [search, setSearch] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fzf = new Fzf(windows, {
     selector: (item) => item.title,
@@ -32,6 +33,9 @@ function App() {
         unlisten = await listen<Window[]>("windows-updated", (event) => {
           console.log("Received Tauri event:", event.payload);
           if (isMounted) {
+            if (searchInputRef.current) {
+              searchInputRef.current.focus();
+            }
             setWindows(event.payload);
           }
         });
@@ -67,6 +71,7 @@ function App() {
       </div>
       <div>
         <input
+          ref={searchInputRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           autoFocus
