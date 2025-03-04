@@ -8,9 +8,8 @@ use windows::Win32::Graphics::Dwm::{
     DWM_THUMBNAIL_PROPERTIES,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetForegroundWindow, GetWindowLongW, GetWindowTextW, GetWindowThreadProcessId,
-    IsWindowVisible, SetForegroundWindow, GWL_EXSTYLE, GWL_STYLE, WS_CAPTION, WS_EX_TOOLWINDOW,
-    WS_VISIBLE,
+    EnumWindows, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
+    SetForegroundWindow, GWL_EXSTYLE, GWL_STYLE, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
 
 #[derive(Debug)]
