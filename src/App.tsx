@@ -3,6 +3,8 @@ import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { Fzf } from "fzf";
+import { cn } from "./lib/utils";
+import { ChevronRight } from "lucide-react";
 
 type Window = {
   hwnd: number;
@@ -37,7 +39,7 @@ function App() {
               searchInputRef.current.focus();
             }
             setSelectedWindow(0);
-            setSearch("")
+            setSearch("");
             setWindows(event.payload);
           }
         });
@@ -95,10 +97,10 @@ function App() {
                 onClick={async () => {
                   await invoke("focus_window", { hwnd: window.hwnd });
                 }}
-                style={{
-                  backgroundColor: isSelected ? "#007AFF" : "#000000",
-                }}
-                className="text-white text-left whitespace-nowrap overflow-hidden text-ellipsis"
+                className={cn(
+                  "text-white text-left whitespace-nowrap overflow-hidden text-ellipsis",
+                  isSelected ? "bg-slate-700" : ""
+                )}
               >
                 {window.title}
               </button>
@@ -111,14 +113,15 @@ function App() {
           </p>
         </div>
       </div>
-      <div>
+      <div className="flex border-white items-center border bg-slate-900 text-white p-2">
+        <ChevronRight className="text-white w-5 h-5 " />
         <input
           ref={searchInputRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           autoFocus
           placeholder="Search..."
-          className="focus:outline-none w-full border-white border bg-slate-900 text-white p-2"
+          className="focus:outline-none w-full bg-slate-900"
         />
       </div>
     </div>
