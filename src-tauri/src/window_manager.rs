@@ -49,6 +49,7 @@ impl WindowManager {
         self.windows.lock().unwrap().clear();
 
         unsafe {
+            // Fetch windows and call the callback function for each window
             EnumWindows(
                 Some(Self::enum_window_proc),
                 LPARAM(self as *const _ as isize),
@@ -115,6 +116,7 @@ impl WindowManager {
             return TRUE;
         }
 
+        // if the window is not visible, skip it
         if !IsWindowVisible(hwnd).as_bool() {
             return TRUE;
         }
@@ -130,6 +132,7 @@ impl WindowManager {
             return TRUE;
         }
 
+        // get the window title
         let mut title = [0u16; 512];
         let len = GetWindowTextW(hwnd, &mut title);
         if len == 0 {
