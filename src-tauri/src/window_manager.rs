@@ -107,6 +107,14 @@ impl WindowManager {
     unsafe extern "system" fn enum_window_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
         let window_manager = &mut *(lparam.0 as *mut WindowManager);
 
+        // if the window is the binocular process, skip it
+        let mut process_id = 0u32;
+        GetWindowThreadProcessId(hwnd, Some(&mut process_id));
+
+        if process_id == window_manager.current_pid {
+            return TRUE;
+        }
+
         if !IsWindowVisible(hwnd).as_bool() {
             return TRUE;
         }
@@ -128,12 +136,6 @@ impl WindowManager {
             return TRUE;
         }
 
-        let mut process_id = 0u32;
-        GetWindowThreadProcessId(hwnd, Some(&mut process_id));
-
-        if process_id == window_manager.current_pid {
-            return TRUE;
-        }
 
         let title = String::from_utf16_lossy(&title[..len as usize]);
 
