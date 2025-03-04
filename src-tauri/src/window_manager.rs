@@ -111,14 +111,14 @@ impl WindowManager {
             return TRUE;
         }
 
-        let style = GetWindowLongW(hwnd, GWL_STYLE);
-        let ex_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+        let style = GetWindowLongPtrW(hwnd, GWL_STYLE);
+        let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
 
-        if (style & ((WS_VISIBLE | WS_CAPTION).0 as i32)) != ((WS_VISIBLE | WS_CAPTION).0 as i32) {
+        if (style & ((WS_VISIBLE | WS_CAPTION).0 as isize)) != ((WS_VISIBLE | WS_CAPTION).0 as isize) {
             return TRUE;
         }
 
-        if (ex_style & (WS_EX_TOOLWINDOW.0 as i32)) != 0 {
+        if (ex_style & (WS_EX_TOOLWINDOW.0 as isize)) != 0 {
             return TRUE;
         }
 
