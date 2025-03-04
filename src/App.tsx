@@ -37,6 +37,7 @@ function App() {
               searchInputRef.current.focus();
             }
             setSelectedWindow(0);
+            setSearch("")
             setWindows(event.payload);
           }
         });
