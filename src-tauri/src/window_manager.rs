@@ -73,37 +73,6 @@ impl WindowManager {
         }
     }
 
-    pub fn get_window_thumbnail(
-        &self,
-        source_hwnd: isize,
-        dest_hwnd: isize,
-        width: u32,
-        height: u32,
-    ) -> Result<(), WindowsError> {
-        unsafe {
-            let mut thumbnail_id = DwmRegisterThumbnail(HWND(dest_hwnd), HWND(source_hwnd))?;
-
-            let props = DWM_THUMBNAIL_PROPERTIES {
-                dwFlags: 0x1F,
-                rcDestination: windows::Win32::Foundation::RECT {
-                    left: 0,
-                    top: 0,
-                    right: width as i32,
-                    bottom: height as i32,
-                },
-                rcSource: windows::Win32::Foundation::RECT::default(),
-                opacity: 255,
-                fVisible: true.into(),
-                fSourceClientAreaOnly: false.into(),
-            };
-
-            DwmUpdateThumbnailProperties(thumbnail_id, &props)?;
-
-            // You'll need to call DwmUnregisterThumbnail(thumbnail_id) when done
-            Ok(())
-        }
-    }
-
     unsafe extern "system" fn enum_window_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
         let window_manager = &mut *(lparam.0 as *mut WindowManager);
 
@@ -123,7 +92,9 @@ impl WindowManager {
         let style = GetWindowLongPtrW(hwnd, GWL_STYLE);
         let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
 
-        if (style & ((WS_VISIBLE | WS_CAPTION).0 as isize)) != ((WS_VISIBLE | WS_CAPTION).0 as isize) {
+        if (style & ((WS_VISIBLE | WS_CAPTION).0 as isize))
+            != ((WS_VISIBLE | WS_CAPTION).0 as isize)
+        {
             return TRUE;
         }
 
@@ -137,7 +108,6 @@ impl WindowManager {
         if len == 0 {
             return TRUE;
         }
-
 
         let title = String::from_utf16_lossy(&title[..len as usize]);
 
