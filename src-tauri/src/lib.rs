@@ -3,7 +3,7 @@ mod window_manager;
 use std::process;
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use window_manager::{WindowInfo, WindowManager};
+use window_manager::WindowManager;
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
     println!("getting windows");
@@ -64,13 +64,27 @@ fn setup_main_window(app: &App) {
         .expect("failed to set always on top");
 }
 
+#[cfg(debug_assertions)]
+fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    use tauri_plugin_prevent_default::Flags;
+
+    tauri_plugin_prevent_default::Builder::new()
+        .with_flags(Flags::all().difference(Flags::DEV_TOOLS | Flags::RELOAD))
+        .build()
+}
+
+#[cfg(not(debug_assertions))]
+fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    tauri_plugin_prevent_default::init()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let current_pid = process::id();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_prevent_default::init())
+        .plugin(prevent_default())
         .manage(WindowManager {
             windows: Default::default(),
             current_pid,
