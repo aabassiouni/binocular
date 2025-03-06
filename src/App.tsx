@@ -10,6 +10,7 @@ type Window = {
   hwnd: number;
   title: string;
   process_id: number;
+  icon_base64?: string;
 };
 
 function App() {
@@ -98,10 +99,19 @@ function App() {
                   await invoke("focus_window", { hwnd: window.hwnd });
                 }}
                 className={cn(
-                  "text-white text-left whitespace-nowrap overflow-hidden text-ellipsis",
+                  "text-white text-left whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-2 p-1",
                   isSelected ? "bg-slate-700" : ""
                 )}
               >
+                {window.icon_base64 ? (
+                  <img
+                    src={window.icon_base64}
+                    alt=""
+                    className="w-4 h-4 flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-4 h-4 bg-gray-600 flex-shrink-0" />
+                )}
                 {window.title}
               </button>
             );
