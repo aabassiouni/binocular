@@ -10,7 +10,8 @@ use windows::Win32::Graphics::Dwm::{
     DWM_THUMBNAIL_PROPERTIES,
 };
 use windows::Win32::Graphics::Gdi::{
-    BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, SelectObject, COLOR_GRADIENTACTIVECAPTION, SRCCOPY
+    BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC,
+    SelectObject, COLOR_GRADIENTACTIVECAPTION, SRCCOPY,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetClassLongPtrW, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId,
@@ -86,7 +87,8 @@ impl WindowManager {
 
     unsafe fn get_window_icon(hwnd: HWND) -> Option<String> {
         // Try different methods to get the icon
-        let mut h_icon = HICON(SendMessageW(hwnd, WM_GETICON, WPARAM(ICON_SMALL as usize), LPARAM(0)).0);
+        let mut h_icon =
+            HICON(SendMessageW(hwnd, WM_GETICON, WPARAM(ICON_SMALL as usize), LPARAM(0)).0);
         if h_icon.0 == 0 {
             h_icon = HICON(SendMessageW(hwnd, WM_GETICON, WPARAM(ICON_BIG as usize), LPARAM(0)).0);
         }
@@ -171,6 +173,12 @@ impl WindowManager {
 
         if result == 0 {
             return None;
+        }
+
+        // Convert BGRA to RGBA (Windows stores colors as BGRA)
+        for pixel in buffer.chunks_exact_mut(4) {
+            // Swap Blue and Red channels
+            pixel.swap(0, 2);
         }
 
         // Encode as PNG and convert to base64
