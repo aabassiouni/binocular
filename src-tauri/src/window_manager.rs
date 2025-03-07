@@ -2,16 +2,10 @@ use base64::{engine::general_purpose, Engine as _};
 use serde::Serialize;
 use std::fmt;
 use std::sync::Mutex;
-use tauri::image::Image;
 use windows::core::Error as WindowsError;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE, WIN32_ERROR, WPARAM};
-use windows::Win32::Graphics::Dwm::{
-    DwmRegisterThumbnail, DwmUnregisterThumbnail, DwmUpdateThumbnailProperties,
-    DWM_THUMBNAIL_PROPERTIES,
-};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE, WPARAM};
 use windows::Win32::Graphics::Gdi::{
-    BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC,
-    SelectObject, COLOR_GRADIENTACTIVECAPTION, SRCCOPY,
+    CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, SelectObject,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetClassLongPtrW, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId,
@@ -182,11 +176,8 @@ impl WindowManager {
         }
 
         // Encode as PNG and convert to base64
-        let png_data = match image::RgbaImage::from_raw(
-            icon_size as u32,
-            icon_size as u32,
-            buffer,
-        ) {
+        let png_data = match image::RgbaImage::from_raw(icon_size as u32, icon_size as u32, buffer)
+        {
             Some(img) => {
                 let mut cursor = std::io::Cursor::new(Vec::new());
                 if let Ok(_) = img.write_to(&mut cursor, image::ImageOutputFormat::Png) {
