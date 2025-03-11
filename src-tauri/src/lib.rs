@@ -15,15 +15,6 @@ fn get_windows(app: &AppHandle) -> Result<(), String> {
         .refresh_window_list()
         .map_err(|e| e.to_string())?;
 
-    state
-        .get_windows()
-        .lock()
-        .unwrap()
-        .iter()
-        .for_each(|window| {
-            println!("window: {:?}", window);
-        });
-
     app.emit("windows-updated", state.windows.lock().unwrap().clone())
         .unwrap();
 
