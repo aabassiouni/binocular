@@ -11,6 +11,7 @@
     "global-shortcut:allow-is-registered",
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
-    "prevent-default:default"
+    "prevent-default:default",
+    "autostart:default"
   ]
 }
