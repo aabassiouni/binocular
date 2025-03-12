@@ -191,7 +191,6 @@ impl WindowManager {
 
         // Convert to base64
         let base64_string = general_purpose::STANDARD.encode(png_data);
-        println!("{}", base64_string);
         Some(format!("data:image/png;base64,{}", base64_string))
     }
 
