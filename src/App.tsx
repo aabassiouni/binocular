@@ -1,21 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
-import { invoke } from "@tauri-apps/api/core";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { type UnlistenFn } from "@tauri-apps/api/event";
 import { Fzf } from "fzf";
 import { cn } from "./lib/utils";
 import { ChevronRight } from "lucide-react";
-import { hide } from "@tauri-apps/api/app";
-
-type Window = {
-  hwnd: number;
-  title: string;
-  process_id: number;
-  icon_base64?: string;
-};
+import {
+  addWindowsUpdatedListener,
+  focusWindow,
+  hideWindow,
+} from "./lib/tauri";
+import { NativeWindow } from "./lib/types";
 
 function App() {
-  const [windows, setWindows] = useState<Window[]>([]);
+  const [windows, setWindows] = useState<NativeWindow[]>([]);
   const [search, setSearch] = useState("");
   const [selectedWindow, setSelectedWindow] = useState<number>(0);
 
@@ -34,7 +31,7 @@ function App() {
 
     const setupListener = async () => {
       try {
-        unlisten = await listen<Window[]>("windows-updated", (event) => {
+        unlisten = await addWindowsUpdatedListener((event) => {
           console.log("Received Tauri event:", event.payload);
           if (isMounted) {
             if (searchInputRef.current) {
@@ -86,12 +83,12 @@ function App() {
       if (e.key === "Enter") {
         if (selectedWindow < filteredWindows.length) {
           const window = filteredWindows[selectedWindow];
-          await invoke("focus_window", { hwnd: window.hwnd });
+          await focusWindow(window.hwnd);
         }
       }
 
       if (e.key === "Escape") {
-        await invoke("hide_window");
+        await hideWindow();
       }
 
       if (e.key === "Tab") {
@@ -115,13 +112,13 @@ function App() {
     <div className="bg-slate-900 flex flex-col p-4 gap-2 h-screen w-screen">
       <div className="flex-1 flex gap-2">
         <div className="border border-white flex-1 h-full w-1/2 p-2 flex flex-col-reverse">
-          {filteredWindows.map((window: Window, index: number) => {
+          {filteredWindows.map((window: NativeWindow, index: number) => {
             const isSelected = index === selectedWindow;
             return (
               <button
                 key={window.hwnd}
                 onClick={async () => {
-                  await invoke("focus_window", { hwnd: window.hwnd });
+                  await focusWindow(window.hwnd);
                 }}
                 className={cn(
                   "text-white text-left whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-2 p-1",
