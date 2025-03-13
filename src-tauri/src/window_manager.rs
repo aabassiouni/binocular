@@ -65,9 +65,6 @@ impl WindowManager {
         Ok(())
     }
 
-    pub fn get_windows(&self) -> &Mutex<Vec<WindowInfo>> {
-        &self.windows
-    }
 
     pub fn focus_window(&self, hwnd: isize) -> Result<(), ()> {
         unsafe {
