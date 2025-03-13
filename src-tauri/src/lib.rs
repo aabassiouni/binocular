@@ -6,7 +6,6 @@ use tauri::{
     tray::TrayIconBuilder,
     AppHandle, Emitter, Manager, State,
 };
-use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use window_manager::WindowManager;
 
@@ -67,6 +66,8 @@ pub fn run() {
             // Only enable autostart in release builds
             #[cfg(not(debug_assertions))]
             {
+                use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
+
                 app.handle().plugin(tauri_plugin_autostart::init(
                     MacosLauncher::LaunchAgent,
                     Some(vec!["--flag1", "--flag2"]),
