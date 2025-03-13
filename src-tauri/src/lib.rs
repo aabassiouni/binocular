@@ -116,20 +116,26 @@ pub fn run() {
 
                         if shortcut == &ctrl_n_shortcut {
                             match event.state() {
-                                ShortcutState::Pressed => {
-                                    if main_window.is_visible().unwrap() {
-                                        println!("hiding");
-                                        main_window.hide().unwrap();
-                                    } else {
-                                        println!("showing");
-                                        get_windows(app).unwrap();
-                                        main_window.show().unwrap();
-                                        main_window.set_focus().unwrap();
+                                ShortcutState::Pressed => match main_window.is_visible() {
+                                    Ok(true) => {
+                                        main_window.hide().expect("failed to hide window");
                                     }
-                                }
-                                ShortcutState::Released => {
-                                    println!("Ctrl-N Released!");
-                                }
+                                    Ok(false) => {
+                                        if let Err(e) = get_windows(app) {
+                                            println!("Error refreshing window list: {e}");
+                                        }
+                                        if let Err(e) = main_window.show() {
+                                            println!("Error showing window: {e}");
+                                        }
+                                        if let Err(e) = main_window.set_focus() {
+                                            println!("Error focusing window: {e}");
+                                        }
+                                    }
+                                    Err(e) => {
+                                        println!("Error checking window visibility: {e}");
+                                    }
+                                },
+                                _ => {}
                             }
                         }
                     })
