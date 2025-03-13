@@ -125,11 +125,6 @@ function App() {
             );
           })}
         </div>
-        <div className="border border-white flex-1 h-full  w-1/2 p-2">
-          <p className="text-white text-left whitespace-nowrap overflow-hidden text-ellipsis">
-            {selectedWindow}
-          </p>
-        </div>
       </div>
       <div className="flex border-white items-center border bg-slate-900 text-white p-2">
         <ChevronRight className="text-white w-5 h-5 " />
