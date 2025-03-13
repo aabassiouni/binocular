@@ -37,18 +37,17 @@ fn focus_window(
     Ok(())
 }
 
-#[cfg(debug_assertions)]
 fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use tauri_plugin_prevent_default::Flags;
 
     tauri_plugin_prevent_default::Builder::new()
-        .with_flags(Flags::all().difference(Flags::DEV_TOOLS | Flags::RELOAD))
+        .with_flags(Flags::all().difference(
+            #[cfg(debug_assertions)]
+            {
+                Flags::DEV_TOOLS | Flags::RELOAD
+            },
+        ))
         .build()
-}
-
-#[cfg(not(debug_assertions))]
-fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
-    tauri_plugin_prevent_default::init()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
