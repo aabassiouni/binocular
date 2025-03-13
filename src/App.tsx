@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { Fzf } from "fzf";
 import { cn } from "./lib/utils";
 import { ChevronRight } from "lucide-react";
+import { hide } from "@tauri-apps/api/app";
 
 type Window = {
   hwnd: number;
@@ -60,8 +61,8 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    async (e: KeyboardEvent) => {
       if (e.ctrlKey) {
         if (e.key === "k") {
           setSelectedWindow((prev) =>
@@ -77,11 +78,18 @@ function App() {
       if (e.key === "Enter") {
         if (selectedWindow < filteredWindows.length) {
           const window = filteredWindows[selectedWindow];
-          invoke("focus_window", { hwnd: window.hwnd });
+          await invoke("focus_window", { hwnd: window.hwnd });
         }
       }
-    };
 
+      if (e.key === "Escape") {
+        await invoke("hide_window");
+      }
+    },
+    [filteredWindows, selectedWindow]
+  );
+
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [filteredWindows, selectedWindow]);

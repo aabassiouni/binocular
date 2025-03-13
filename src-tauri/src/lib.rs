@@ -37,6 +37,13 @@ fn focus_window(
     Ok(())
 }
 
+#[tauri::command]
+fn hide_window(app_handle: tauri::AppHandle) -> Result<(), String> {
+    let main_window = app_handle.get_webview_window("main").unwrap();
+    main_window.hide().unwrap();
+    Ok(())
+}
+
 fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use tauri_plugin_prevent_default::Flags;
 
@@ -133,7 +140,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![focus_window])
+        .invoke_handler(tauri::generate_handler![focus_window, hide_window])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
