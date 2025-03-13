@@ -61,17 +61,25 @@ function App() {
     };
   }, []);
 
+  function getNextWindow() {
+    setSelectedWindow((prev) =>
+      prev < filteredWindows.length - 1 ? prev + 1 : 0
+    );
+  }
+
+  function getPreviousWindow() {
+    setSelectedWindow((prev) =>
+      prev > 0 ? prev - 1 : filteredWindows.length - 1
+    );
+  }
+
   const handleKeyDown = useCallback(
     async (e: KeyboardEvent) => {
       if (e.ctrlKey) {
         if (e.key === "k") {
-          setSelectedWindow((prev) =>
-            prev < filteredWindows.length - 1 ? prev + 1 : 0
-          );
+          getNextWindow();
         } else if (e.key === "j") {
-          setSelectedWindow((prev) =>
-            prev > 0 ? prev - 1 : filteredWindows.length - 1
-          );
+          getPreviousWindow();
         }
       }
 
@@ -84,6 +92,15 @@ function App() {
 
       if (e.key === "Escape") {
         await invoke("hide_window");
+      }
+
+      if (e.key === "Tab") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          getNextWindow();
+        } else {
+          getPreviousWindow();
+        }
       }
     },
     [filteredWindows, selectedWindow]
