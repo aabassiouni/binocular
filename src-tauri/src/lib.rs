@@ -4,7 +4,7 @@ use std::process;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    App, AppHandle, Emitter, Manager, State,
+    AppHandle, Emitter, Manager, State,
 };
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -38,28 +38,6 @@ fn focus_window(
     Ok(())
 }
 
-fn setup_main_window(app: &App) {
-    let main_window = app.get_webview_window("main").unwrap();
-
-    main_window.center().expect("failed to center window");
-
-    main_window
-        .set_resizable(false)
-        .expect("failed to set resizable");
-
-    main_window
-        .set_decorations(false)
-        .expect("failed to set decorations");
-
-    main_window
-        .set_skip_taskbar(true)
-        .expect("failed to set skip taskbar");
-
-    main_window
-        .set_always_on_top(true)
-        .expect("failed to set always on top");
-}
-
 #[cfg(debug_assertions)]
 fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use tauri_plugin_prevent_default::Flags;
@@ -86,8 +64,7 @@ pub fn run() {
             current_pid,
         })
         .setup(|app| {
-            setup_main_window(app);
-
+            // Only enable autostart in release builds
             #[cfg(not(debug_assertions))]
             {
                 app.handle().plugin(tauri_plugin_autostart::init(
