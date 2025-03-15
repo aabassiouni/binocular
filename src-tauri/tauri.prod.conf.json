@@ -1,0 +1,6 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "binocular",
+  "mainBinaryName": "binocular",
+  "identifier": "com.binocular.app"
+}

@@ -93,9 +93,12 @@ pub fn run() {
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&quit_i])?;
 
+            let product_name = app.config().product_name.clone().unwrap();
+            
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
+                .tooltip(product_name)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
                         println!("quit menu item was clicked");

@@ -1,8 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "binocular",
+  "productName": "binocular - dev",
+  "mainBinaryName": "binocular - dev",
   "version": "0.1.0",
-  "identifier": "com.binocular.app",
+  "identifier": "com.binocular.app.dev",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
