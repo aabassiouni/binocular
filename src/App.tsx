@@ -97,6 +97,10 @@ function App() {
   );
 
   useEffect(() => {
+    setSelectedWindow(0);
+  }, [search]);
+
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [filteredWindows, selectedWindow]);
