@@ -25,22 +25,18 @@ function App() {
   const filteredWindows = fzf.find(search).map((item) => item.item);
 
   useEffect(() => {
-    let isMounted = true;
-
     let unlisten: UnlistenFn;
 
     const setupListener = async () => {
       try {
         unlisten = await addWindowsUpdatedListener((event) => {
           console.log("Received Tauri event:", event.payload);
-          if (isMounted) {
-            if (searchInputRef.current) {
-              searchInputRef.current.focus();
-            }
-            setSelectedWindow(0);
-            setSearch("");
-            setWindows(event.payload);
+          if (searchInputRef.current) {
+            searchInputRef.current.focus();
           }
+          setSelectedWindow(0);
+          setSearch("");
+          setWindows(event.payload);
         });
       } catch (error) {
         console.error("Error setting up Tauri event listener:", error);
@@ -50,8 +46,6 @@ function App() {
     setupListener();
 
     return () => {
-      isMounted = false;
-
       if (unlisten) {
         unlisten();
       }
