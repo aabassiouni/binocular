@@ -72,12 +72,20 @@ function App() {
 
   const handleKeyDown = useCallback(
     async (e: KeyboardEvent) => {
-      if (e.ctrlKey) {
-        if (e.key === "k") {
-          getNextWindow();
-        } else if (e.key === "j") {
-          getPreviousWindow();
-        }
+      if (
+        (e.ctrlKey && e.key === "k") ||
+        (e.key === "Tab" && e.shiftKey) ||
+        e.key === "ArrowUp"
+      ) {
+        getNextWindow();
+      }
+
+      if (
+        (e.ctrlKey && e.key === "j") ||
+        (e.key === "Tab" && !e.shiftKey) ||
+        e.key === "ArrowDown"
+      ) {
+        getPreviousWindow();
       }
 
       if (e.key === "Enter") {
@@ -89,15 +97,6 @@ function App() {
 
       if (e.key === "Escape") {
         await hideWindow();
-      }
-
-      if (e.key === "Tab") {
-        e.preventDefault();
-        if (e.shiftKey) {
-          getNextWindow();
-        } else {
-          getPreviousWindow();
-        }
       }
     },
     [filteredWindows, selectedWindow]
