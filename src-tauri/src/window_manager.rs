@@ -1,8 +1,6 @@
 use base64::{engine::general_purpose, Engine as _};
 use serde::Serialize;
-use std::fmt;
 use std::sync::Mutex;
-use windows::core::Error as WindowsError;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE, WPARAM};
 use windows::Win32::Graphics::Gdi::{
     CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, SelectObject,
@@ -12,29 +10,6 @@ use windows::Win32::UI::WindowsAndMessaging::{
     IsWindowVisible, SendMessageW, SetForegroundWindow, GCLP_HICON, GCLP_HICONSM, GWL_EXSTYLE,
     GWL_STYLE, HICON, ICON_BIG, ICON_SMALL, WM_GETICON, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
-
-#[derive(Debug)]
-pub enum WindowError {
-    EnumWindowsFailed(WindowsError),
-    SetForegroundFailed(WindowsError),
-    GetIconFailed(WindowsError),
-    IconExtractionFailed,
-}
-
-impl fmt::Display for WindowError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            WindowError::EnumWindowsFailed(e) => write!(f, "Failed to enumerate windows: {}", e),
-            WindowError::SetForegroundFailed(e) => {
-                write!(f, "Failed to set foreground window: {}", e)
-            }
-            WindowError::GetIconFailed(e) => write!(f, "Failed to get window icon: {}", e),
-            WindowError::IconExtractionFailed => write!(f, "Failed to extract window icon"),
-        }
-    }
-}
-
-impl std::error::Error for WindowError {}
 
 #[derive(Debug, Serialize, Clone)]
 pub struct WindowInfo {
@@ -50,21 +25,22 @@ pub struct WindowManager {
 }
 
 impl WindowManager {
-    pub fn refresh_window_list(&self) -> Result<(), WindowError> {
+    pub fn refresh_window_list(&self) -> Result<(), windows::core::Error> {
         self.windows.lock().unwrap().clear();
 
         unsafe {
             // Fetch windows and call the callback function for each window
-            EnumWindows(
+            match EnumWindows(
                 Some(Self::enum_window_proc),
                 LPARAM(self as *const _ as isize),
-            )
-            .map_err(WindowError::EnumWindowsFailed)?;
+            ) {
+                Ok(_) => (),
+                Err(e) => return Err(e),
+            }
         }
 
         Ok(())
     }
-
 
     pub fn focus_window(&self, hwnd: isize) -> Result<(), ()> {
         unsafe {
@@ -119,8 +95,12 @@ impl WindowManager {
         if !result.is_ok() {
             // Clean up and return None if drawing failed
             SelectObject(hdc_mem, old_bitmap);
-            DeleteObject(h_bitmap);
-            DeleteDC(hdc_mem);
+            if !DeleteObject(h_bitmap).as_bool() {
+                println!("Failed to delete object");
+            };
+            if !DeleteDC(hdc_mem).as_bool() {
+                println!("Failed to delete dc");
+            };
             return None;
         }
 
@@ -159,8 +139,8 @@ impl WindowManager {
 
         // Clean up
         SelectObject(hdc_mem, old_bitmap);
-        DeleteObject(h_bitmap);
-        DeleteDC(hdc_mem);
+        let _ = DeleteObject(h_bitmap);
+        let _ = DeleteDC(hdc_mem);
 
         if result == 0 {
             return None;
