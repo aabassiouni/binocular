@@ -24,34 +24,6 @@ function App() {
 
   const filteredWindows = fzf.find(search).map((item) => item.item);
 
-  useEffect(() => {
-    let unlisten: UnlistenFn;
-
-    const setupListener = async () => {
-      try {
-        unlisten = await addWindowsUpdatedListener((event) => {
-          console.log("Received Tauri event:", event.payload);
-          if (searchInputRef.current) {
-            searchInputRef.current.focus();
-          }
-          setSelectedWindow(0);
-          setSearch("");
-          setWindows(event.payload);
-        });
-      } catch (error) {
-        console.error("Error setting up Tauri event listener:", error);
-      }
-    };
-
-    setupListener();
-
-    return () => {
-      if (unlisten) {
-        unlisten();
-      }
-    };
-  }, []);
-
   function getNextWindow() {
     setSelectedWindow((prev) =>
       prev < filteredWindows.length - 1 ? prev + 1 : 0
@@ -95,6 +67,34 @@ function App() {
     },
     [filteredWindows, selectedWindow]
   );
+
+  useEffect(() => {
+    let unlisten: UnlistenFn;
+
+    const setupListener = async () => {
+      try {
+        unlisten = await addWindowsUpdatedListener((event) => {
+          console.log("Received Tauri event:", event.payload);
+          if (searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+          setSelectedWindow(0);
+          setSearch("");
+          setWindows(event.payload);
+        });
+      } catch (error) {
+        console.error("Error setting up Tauri event listener:", error);
+      }
+    };
+
+    setupListener();
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setSelectedWindow(0);
