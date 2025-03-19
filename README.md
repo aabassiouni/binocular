@@ -1,7 +1,36 @@
-# Tauri + React + Typescript
+# Binocular
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+An alternative app switcher for Windows inspired by [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim).
 
-## Recommended IDE Setup
+## Disclaimer
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+This project is in its early stages and is a work in progress. I do not make any guarantees about its stability, functionality, performace, or quality of code.
+
+Use at your own risk.
+
+## Technologies
+
+- [Tauri](https://tauri.app/)
+- [React](https://reactjs.org/)
+
+## Contributing
+
+PRs are welcome and encouraged. 
+
+## Development
+
+### Prerequisites
+
+- Rust
+- Bun
+
+### Setup
+
+1. Install Rust
+2. Install Bun
+3. Run `bun install`
+4. Run `bun tauri dev`
+
+## License
+
+MIT
