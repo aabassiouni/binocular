@@ -7,8 +7,9 @@ use windows::Win32::Graphics::Gdi::{
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetClassLongPtrW, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId,
-    IsWindowVisible, SendMessageW, SetForegroundWindow, GCLP_HICON, GCLP_HICONSM, GWL_EXSTYLE,
-    GWL_STYLE, HICON, ICON_BIG, ICON_SMALL, WM_GETICON, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
+    IsIconic, IsWindowVisible, SendMessageW, SetForegroundWindow, ShowWindow, GCLP_HICON,
+    GCLP_HICONSM, GWL_EXSTYLE, GWL_STYLE, HICON, ICON_BIG, ICON_SMALL, SW_RESTORE, WM_GETICON,
+    WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
 
 #[derive(Debug, Serialize, Clone)]
@@ -42,12 +43,22 @@ impl WindowManager {
         Ok(())
     }
 
-    pub fn focus_window(&self, hwnd: isize) -> Result<(), ()> {
+    pub fn focus_window(&self, hwnd: isize) {
         unsafe {
-            if SetForegroundWindow(HWND(hwnd)).as_bool() {
-                Ok(())
-            } else {
-                Err(())
+            let hwnd = HWND(hwnd);
+
+            // Restore window if minimized
+            if IsIconic(hwnd).as_bool() {
+                match ShowWindow(hwnd, SW_RESTORE).as_bool() {
+                    true => {}
+                    false => println!("Failed to restore window"),
+                }
+            }
+
+            // Try to bring it to the foreground
+            match SetForegroundWindow(hwnd).as_bool() {
+                true => {}
+                false => println!("Failed to bring window to the foreground"),
             }
         }
     }

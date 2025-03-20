@@ -26,15 +26,10 @@ fn get_windows(app: &AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn focus_window(
-    app_handle: tauri::AppHandle,
-    state: State<WindowManager>,
-    hwnd: isize,
-) -> Result<(), String> {
+fn focus_window(app_handle: tauri::AppHandle, state: State<WindowManager>, hwnd: isize) {
     let main_window = app_handle.get_webview_window("main").unwrap();
     main_window.hide().unwrap();
-    state.inner().focus_window(hwnd).unwrap();
-    Ok(())
+    state.inner().focus_window(hwnd)
 }
 
 #[tauri::command]
@@ -94,7 +89,7 @@ pub fn run() {
             let menu = Menu::with_items(app, &[&quit_i])?;
 
             let product_name = app.config().product_name.clone().unwrap();
-            
+
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
