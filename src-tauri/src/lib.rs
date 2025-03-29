@@ -1,4 +1,5 @@
 mod window_manager;
+mod utils;
 
 use std::process;
 use tauri::{
