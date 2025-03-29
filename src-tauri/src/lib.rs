@@ -11,8 +11,6 @@ use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut,
 use window_manager::WindowManager;
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
-    println!("getting windows");
-
     let state = app.state::<WindowManager>();
 
     state
