@@ -140,7 +140,10 @@ pub fn run() {
                     .build(),
             )?;
 
-            app.global_shortcut().register(ctrl_n_shortcut).unwrap();
+            match app.global_shortcut().register(ctrl_n_shortcut) {
+                Ok(_) => println!("registered global shortcut"),
+                Err(e) => println!("failed to register global shortcut: {e}"),
+            }
 
             Ok(())
         })
