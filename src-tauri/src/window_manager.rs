@@ -1,9 +1,12 @@
 use crate::utils::icon;
+use crate::utils::process::get_process_name;
 use serde::Serialize;
 use std::sync::Mutex;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE};
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId, IsIconic, IsWindowVisible, SetForegroundWindow, ShowWindow, GWL_EXSTYLE, GWL_STYLE, SW_RESTORE, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
+    EnumWindows, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId, IsIconic,
+    IsWindowVisible, SetForegroundWindow, ShowWindow, GWL_EXSTYLE, GWL_STYLE, SW_RESTORE,
+    WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
 
 #[derive(Debug, Serialize, Clone)]
@@ -11,6 +14,7 @@ pub struct WindowInfo {
     pub hwnd: isize,
     pub title: String,
     pub process_id: u32,
+    pub process_name: Option<String>,
     pub icon_base64: Option<String>,
 }
 
@@ -67,6 +71,7 @@ impl WindowManager {
 
         // if the window is the binocular process, skip it
         let mut process_id = 0u32;
+
         GetWindowThreadProcessId(hwnd, Some(&mut process_id));
 
         if process_id == window_manager.current_pid {
@@ -100,11 +105,13 @@ impl WindowManager {
 
         let title = String::from_utf16_lossy(&title[..len as usize]);
         let icon_base64 = Self::get_window_icon(hwnd);
+        let process_name = get_process_name(process_id);
 
         window_manager.windows.lock().unwrap().push(WindowInfo {
             hwnd: hwnd.0,
             title,
             process_id,
+            process_name,
             icon_base64,
         });
 

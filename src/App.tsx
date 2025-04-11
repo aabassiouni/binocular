@@ -19,7 +19,7 @@ function App() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fzf = new Fzf(windows, {
-    selector: (item) => item.title,
+    selector: (item) => `${item.title} ${item.process_name}`,
   });
 
   const filteredWindows = fzf.find(search).map((item) => item.item);
