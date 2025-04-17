@@ -1,13 +1,14 @@
-mod window_manager;
 mod utils;
+mod window_manager;
 
 use std::process;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    AppHandle, Emitter, Manager, State,
+    AppHandle, Emitter, Manager, State, WindowEvent,
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+use utils::display::center_window_in_display;
 use window_manager::WindowManager;
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
@@ -42,12 +43,16 @@ fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use tauri_plugin_prevent_default::Flags;
 
     tauri_plugin_prevent_default::Builder::new()
-        .with_flags(Flags::all().difference(
+        .with_flags(Flags::all().difference({
             #[cfg(debug_assertions)]
             {
                 Flags::DEV_TOOLS | Flags::RELOAD
-            },
-        ))
+            }
+            #[cfg(not(debug_assertions))]
+            {
+                Flags::empty()
+            }
+        }))
         .build()
 }
 
@@ -109,8 +114,6 @@ pub fn run() {
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
                     .with_handler(move |app, shortcut, event| {
-                        let main_window = app.get_webview_window("main").unwrap();
-
                         if shortcut == &ctrl_n_shortcut {
                             match event.state() {
                                 ShortcutState::Pressed => match main_window.is_visible() {
@@ -121,6 +124,11 @@ pub fn run() {
                                         if let Err(e) = get_windows(app) {
                                             println!("Error refreshing window list: {e}");
                                         }
+
+                                        if let Err(e) = center_window_in_display(&main_window) {
+                                            println!("Error centering window: {e}");
+                                        }
+
                                         if let Err(e) = main_window.show() {
                                             println!("Error showing window: {e}");
                                         }
