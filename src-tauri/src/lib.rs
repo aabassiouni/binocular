@@ -114,6 +114,8 @@ pub fn run() {
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
                     .with_handler(move |app, shortcut, event| {
+                        let main_window = app.get_webview_window("main").unwrap();
+
                         if shortcut == &ctrl_n_shortcut {
                             match event.state() {
                                 ShortcutState::Pressed => match main_window.is_visible() {
