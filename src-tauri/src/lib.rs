@@ -39,7 +39,7 @@ fn hide_window(app_handle: tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+fn disable_dev_tools_in_dev() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use tauri_plugin_prevent_default::Flags;
 
     tauri_plugin_prevent_default::Builder::new()
@@ -62,7 +62,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .plugin(prevent_default())
+        .plugin(disable_dev_tools_in_dev())
         .manage(WindowManager {
             windows: Default::default(),
             current_pid,
