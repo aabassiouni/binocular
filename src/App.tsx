@@ -4,13 +4,9 @@ import { type UnlistenFn } from "@tauri-apps/api/event";
 import { Fzf } from "fzf";
 import { cn } from "./lib/utils";
 import { ChevronRight } from "lucide-react";
-import {
-  addWindowsUpdatedListener,
-  closeWindow,
-  focusWindow,
-  hideWindow,
-} from "./lib/tauri";
+import { addWindowsUpdatedListener, focusWindow } from "./lib/tauri";
 import { NativeWindow } from "./lib/types";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 function App() {
   const [windows, setWindows] = useState<NativeWindow[]>([]);
@@ -63,7 +59,8 @@ function App() {
       }
 
       if (e.key === "Escape") {
-        await hideWindow();
+        const webview = await getCurrentWebviewWindow();
+        await webview.hide();
       }
     },
     [filteredWindows, selectedWindow]

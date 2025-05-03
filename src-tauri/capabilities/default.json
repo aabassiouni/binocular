@@ -12,6 +12,7 @@
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
     "prevent-default:default",
-    "autostart:default"
+    "autostart:default",
+    "core:window:allow-hide"
   ]
 }

@@ -6,10 +6,6 @@ export async function focusWindow(window: NativeWindow) {
   await invoke("focus_window", { window });
 }
 
-export async function hideWindow() {
-  await invoke("hide_window");
-}
-
 export function addWindowsUpdatedListener(
   callback: EventCallback<NativeWindow[]>
 ) {
