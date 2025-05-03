@@ -8,7 +8,7 @@ use tauri::{
     AppHandle, Emitter, Manager,
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use utils::display::center_window_in_display;
+use utils::{display::center_window_in_display, setup::setup_window_event_listener};
 use window_manager::{Window, WindowManager};
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
@@ -81,6 +81,8 @@ pub fn run() {
                     autostart_manager.is_enabled().unwrap()
                 );
             }
+
+            setup_window_event_listener(app);
 
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&quit_i])?;

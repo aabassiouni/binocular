@@ -4,9 +4,10 @@ use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE};
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId, IsIconic,
-    IsWindowVisible, SendMessageW, SetForegroundWindow, ShowWindow, GWL_EXSTYLE, GWL_STYLE,
-    SW_RESTORE, WM_CLOSE, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
+    EnumWindows, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId,
+    IsIconic, IsWindowVisible, SendMessageW, SetForegroundWindow, ShowWindow,
+    GWL_EXSTYLE, GWL_STYLE, SW_RESTORE, WM_CLOSE,
+    WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

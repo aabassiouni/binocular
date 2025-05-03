@@ -1,3 +1,4 @@
+pub mod display;
 pub mod icon;
 pub mod process;
-pub mod display;
+pub mod setup;
