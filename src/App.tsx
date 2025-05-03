@@ -4,7 +4,11 @@ import { type UnlistenFn } from "@tauri-apps/api/event";
 import { Fzf } from "fzf";
 import { cn } from "./lib/utils";
 import { ChevronRight } from "lucide-react";
-import { addWindowsUpdatedListener, focusWindow } from "./lib/tauri";
+import {
+  addWindowsUpdatedListener,
+  focusWindow,
+  closeWindow,
+} from "./lib/tauri";
 import { NativeWindow } from "./lib/types";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 
@@ -56,6 +60,10 @@ function App() {
           const window = filteredWindows[selectedWindow];
           await focusWindow(window);
         }
+      }
+
+      if (e.ctrlKey && e.key === "w") {
+        await closeWindow(filteredWindows[selectedWindow]);
       }
 
       if (e.key === "Escape") {
