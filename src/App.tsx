@@ -6,6 +6,7 @@ import { cn } from "./lib/utils";
 import { ChevronRight } from "lucide-react";
 import {
   addWindowsUpdatedListener,
+  closeWindow,
   focusWindow,
   hideWindow,
 } from "./lib/tauri";
@@ -57,7 +58,7 @@ function App() {
       if (e.key === "Enter") {
         if (selectedWindow < filteredWindows.length) {
           const window = filteredWindows[selectedWindow];
-          await focusWindow(window.hwnd);
+          await focusWindow(window);
         }
       }
 
@@ -115,7 +116,7 @@ function App() {
               <button
                 key={window.hwnd}
                 onClick={async () => {
-                  await focusWindow(window.hwnd);
+                  await focusWindow(window);
                 }}
                 className={cn(
                   "text-white text-left whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-2 p-1",

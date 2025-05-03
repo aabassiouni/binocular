@@ -1,16 +1,16 @@
 use crate::utils::icon;
 use crate::utils::process::get_process_name;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, TRUE};
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetWindowLongPtrW, GetWindowTextW, GetWindowThreadProcessId, IsIconic,
-    IsWindowVisible, SetForegroundWindow, ShowWindow, GWL_EXSTYLE, GWL_STYLE, SW_RESTORE,
-    WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
+    IsWindowVisible, SendMessageW, SetForegroundWindow, ShowWindow, GWL_EXSTYLE, GWL_STYLE,
+    SW_RESTORE, WM_CLOSE, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
 
-#[derive(Debug, Serialize, Clone)]
-pub struct WindowInfo {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Window {
     pub hwnd: isize,
     pub title: String,
     pub process_id: u32,
@@ -18,8 +18,36 @@ pub struct WindowInfo {
     pub icon_base64: Option<String>,
 }
 
+impl Window {
+    pub fn focus_window(&self) {
+        unsafe {
+            let hwnd = HWND(self.hwnd);
+
+            // Restore window if minimized
+            if IsIconic(hwnd).as_bool() {
+                match ShowWindow(hwnd, SW_RESTORE).as_bool() {
+                    true => {}
+                    false => println!("Failed to restore window"),
+                }
+            }
+
+            // Try to bring it to the foreground
+            match SetForegroundWindow(hwnd).as_bool() {
+                true => {}
+                false => println!("Failed to bring window to the foreground"),
+            }
+        }
+    }
+
+    pub fn close_window(&self) {
+        unsafe {
+            let hwnd = HWND(self.hwnd);
+            SendMessageW(hwnd, WM_CLOSE, None, None);
+        }
+    }
+}
 pub struct WindowManager {
-    pub windows: Mutex<Vec<WindowInfo>>,
+    pub windows: Mutex<Vec<Window>>,
     pub current_pid: u32,
 }
 
@@ -39,26 +67,6 @@ impl WindowManager {
         }
 
         Ok(())
-    }
-
-    pub fn focus_window(&self, hwnd: isize) {
-        unsafe {
-            let hwnd = HWND(hwnd);
-
-            // Restore window if minimized
-            if IsIconic(hwnd).as_bool() {
-                match ShowWindow(hwnd, SW_RESTORE).as_bool() {
-                    true => {}
-                    false => println!("Failed to restore window"),
-                }
-            }
-
-            // Try to bring it to the foreground
-            match SetForegroundWindow(hwnd).as_bool() {
-                true => {}
-                false => println!("Failed to bring window to the foreground"),
-            }
-        }
     }
 
     unsafe fn get_window_icon(hwnd: HWND) -> Option<String> {
@@ -107,7 +115,7 @@ impl WindowManager {
         let icon_base64 = Self::get_window_icon(hwnd);
         let process_name = get_process_name(process_id);
 
-        window_manager.windows.lock().unwrap().push(WindowInfo {
+        window_manager.windows.lock().unwrap().push(Window {
             hwnd: hwnd.0,
             title,
             process_id,

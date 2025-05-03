@@ -5,11 +5,11 @@ use std::process;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    AppHandle, Emitter, Manager, State, WindowEvent,
+    AppHandle, Emitter, Manager,
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use utils::display::center_window_in_display;
-use window_manager::WindowManager;
+use window_manager::{Window, WindowManager};
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
     let state = app.state::<WindowManager>();
@@ -26,10 +26,10 @@ fn get_windows(app: &AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn focus_window(app_handle: tauri::AppHandle, state: State<WindowManager>, hwnd: isize) {
+fn focus_window(app_handle: tauri::AppHandle, window: Window) {
     let main_window = app_handle.get_webview_window("main").unwrap();
     main_window.hide().unwrap();
-    state.inner().focus_window(hwnd)
+    window.focus_window();
 }
 
 #[tauri::command]
@@ -156,7 +156,11 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![focus_window, hide_window])
+        .invoke_handler(tauri::generate_handler![
+            focus_window,
+            hide_window,
+            close_window
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
