@@ -17,6 +17,13 @@ Use at your own risk.
 
 PRs are welcome and encouraged. 
 
+## Build and install
+
+This is temporary until releases are set up.
+
+1. Run `bun build:release` to build the app.
+2. Run `bun install:msi` to install the app.
+
 ## Development
 
 ### Prerequisites
