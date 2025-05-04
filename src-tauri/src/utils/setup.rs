@@ -74,19 +74,19 @@ pub fn setup_window_event_listener(app: &tauri::App) {
         let hwnd = CreateWindowExW(
             Default::default(),
             class_name,
-            w!("Shell Hook Window"),
+            w!("Binocular Shell Hook Window"),
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            HWND_MESSAGE, // Make it a message-only window
+            HWND_MESSAGE,
             None,
             None,
             None,
         );
 
-        // pass app to window_proc
+        // Pass app to window_proc
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, app as *const _ as isize);
 
         // Register for shell hooks

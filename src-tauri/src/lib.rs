@@ -8,7 +8,10 @@ use tauri::{
     AppHandle, Emitter, Manager,
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use utils::{display::center_window_in_display, setup::{setup_autostart, setup_window_event_listener}};
+use utils::{
+    display::center_window_in_display,
+    setup::{setup_autostart, setup_window_event_listener},
+};
 use window_manager::{Window, WindowManager};
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
@@ -66,7 +69,6 @@ pub fn run() {
             current_pid,
         })
         .setup(|app| {
-
             setup_autostart(app);
             setup_window_event_listener(app);
 
