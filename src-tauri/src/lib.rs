@@ -8,7 +8,7 @@ use tauri::{
     AppHandle, Emitter, Manager,
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use utils::{display::center_window_in_display, setup::setup_window_event_listener};
+use utils::{display::center_window_in_display, setup::{setup_autostart, setup_window_event_listener}};
 use window_manager::{Window, WindowManager};
 
 fn get_windows(app: &AppHandle) -> Result<(), String> {
@@ -66,27 +66,8 @@ pub fn run() {
             current_pid,
         })
         .setup(|app| {
-            // Only enable autostart in release builds
-            #[cfg(not(debug_assertions))]
-            {
-                use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
-                app.handle().plugin(tauri_plugin_autostart::init(
-                    MacosLauncher::LaunchAgent,
-                    Some(vec!["--flag1", "--flag2"]),
-                ))?;
-
-                // Get the autostart manager
-                let autostart_manager = app.autolaunch();
-                // Enable autostart
-                let _ = autostart_manager.enable();
-                // Check enable state
-                println!(
-                    "registered for autostart? {}",
-                    autostart_manager.is_enabled().unwrap()
-                );
-            }
-
+            setup_autostart(app);
             setup_window_event_listener(app);
 
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
