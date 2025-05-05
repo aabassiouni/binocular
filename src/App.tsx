@@ -62,12 +62,14 @@ function App() {
         }
       }
 
+      const webview = await getCurrentWebviewWindow();
+
       if (e.ctrlKey && e.key === "w") {
         await closeWindow(filteredWindows[selectedWindow]);
+        await webview.hide();
       }
 
       if (e.key === "Escape") {
-        const webview = await getCurrentWebviewWindow();
         await webview.hide();
       }
     },
