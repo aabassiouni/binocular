@@ -103,7 +103,7 @@ pub fn setup_autostart(app: &tauri::App) {
         app.handle().plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--flag1", "--flag2"]),
-        ))?;
+        )).unwrap();
 
         // Get the autostart manager
         let autostart_manager = app.autolaunch();
