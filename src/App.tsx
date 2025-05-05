@@ -45,6 +45,7 @@ function App() {
         e.key === "ArrowUp"
       ) {
         getNextWindow();
+        return;
       }
 
       if (
@@ -53,12 +54,14 @@ function App() {
         e.key === "ArrowDown"
       ) {
         getPreviousWindow();
+        return;
       }
 
       if (e.key === "Enter") {
         if (selectedWindow < filteredWindows.length) {
           const window = filteredWindows[selectedWindow];
           await focusWindow(window);
+          return;
         }
       }
 
@@ -67,10 +70,12 @@ function App() {
       if (e.ctrlKey && e.key === "w") {
         await closeWindow(filteredWindows[selectedWindow]);
         await webview.hide();
+        return;
       }
 
       if (e.key === "Escape") {
         await webview.hide();
+        return;
       }
     },
     [filteredWindows, selectedWindow]
