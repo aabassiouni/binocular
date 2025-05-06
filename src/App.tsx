@@ -92,7 +92,6 @@ function App() {
     const setupListener = async () => {
       try {
         unlisten = await addWindowsUpdatedListener((event) => {
-          console.log("Received Tauri event:", event.payload);
           if (searchInputRef.current) {
             searchInputRef.current.focus();
           }
