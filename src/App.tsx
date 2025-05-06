@@ -12,6 +12,11 @@ import {
 import { NativeWindow } from "./lib/types";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 
+window.addEventListener("blur", async () => {
+  const webview = await getCurrentWebviewWindow();
+  await webview.hide();
+});
+
 function App() {
   const [windows, setWindows] = useState<NativeWindow[]>([]);
   const [search, setSearch] = useState("");
