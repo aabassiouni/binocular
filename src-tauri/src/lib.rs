@@ -1,4 +1,5 @@
 mod utils;
+mod window;
 mod window_manager;
 
 use std::process;
@@ -17,10 +18,7 @@ use window_manager::{Window, WindowManager};
 fn get_windows(app: &AppHandle) -> Result<(), String> {
     let state = app.state::<WindowManager>();
 
-    state
-        .inner()
-        .refresh_window_list()
-        .map_err(|e| e.to_string())?;
+    state.inner().refresh_window_list();
 
     app.emit("windows-updated", state.windows.lock().unwrap().clone())
         .unwrap();

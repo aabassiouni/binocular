@@ -38,13 +38,13 @@ unsafe extern "system" fn window_proc(
             // Only process visible windows
             match event {
                 HSHELL_WINDOWCREATED => {
-                    state.inner().refresh_window_list().unwrap();
+                    state.inner().refresh_window_list();
 
                     app.emit("windows-updated", state.windows.lock().unwrap().clone())
                         .unwrap();
                 }
                 HSHELL_WINDOWDESTROYED => {
-                    state.inner().refresh_window_list().unwrap();
+                    state.inner().refresh_window_list();
 
                     app.emit("windows-updated", state.windows.lock().unwrap().clone())
                         .unwrap();
@@ -100,10 +100,12 @@ pub fn setup_autostart(app: &tauri::App) {
     {
         use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
-        app.handle().plugin(tauri_plugin_autostart::init(
-            MacosLauncher::LaunchAgent,
-            Some(vec!["--flag1", "--flag2"]),
-        )).unwrap();
+        app.handle()
+            .plugin(tauri_plugin_autostart::init(
+                MacosLauncher::LaunchAgent,
+                Some(vec!["--flag1", "--flag2"]),
+            ))
+            .unwrap();
 
         // Get the autostart manager
         let autostart_manager = app.autolaunch();
