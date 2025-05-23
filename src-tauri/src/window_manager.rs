@@ -33,6 +33,6 @@ impl WindowManager {
     pub fn refresh_window_list(&self) {
         self.windows.lock().unwrap().clear();
 
-        window::get_windows();
+        window::get_windows(self);
     }
 }

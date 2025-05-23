@@ -5,7 +5,11 @@ use windows::Win32::UI::WindowsAndMessaging::{
     SW_RESTORE, WM_CLOSE, WS_CAPTION, WS_EX_TOOLWINDOW, WS_VISIBLE,
 };
 
-pub fn focus_window(hwnd: HWND) {
+use crate::utils::icon;
+use crate::utils::process::get_process_name;
+use crate::window_manager::{Window, WindowManager};
+
+pub fn focus_window(hwnd: isize) {
     unsafe {
         let hwnd = HWND(hwnd);
 
@@ -25,19 +29,20 @@ pub fn focus_window(hwnd: HWND) {
     }
 }
 
-pub fn close_window(hwnd: HWND) {
+pub fn close_window(hwnd: isize) {
     unsafe {
         let hwnd = HWND(hwnd);
         SendMessageW(hwnd, WM_CLOSE, None, None);
     }
 }
 
-pub fn get_windows() {
-    let mut windows = Vec::new();
-
+pub fn get_windows(window_manager: &WindowManager) {
     unsafe {
         // Fetch windows and call the callback function for each window
-        match EnumWindows(Some(enum_window_proc), LPARAM(self as *const _ as isize)) {
+        match EnumWindows(
+            Some(enum_window_proc),
+            LPARAM(window_manager as *const _ as isize),
+        ) {
             Ok(_) => (),
             Err(e) => println!("Error: {}", e),
         }
